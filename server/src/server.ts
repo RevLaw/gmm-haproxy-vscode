@@ -89,8 +89,14 @@ connection.onCompletion((params: TextDocumentPositionParams): CompletionItem[] =
   const doc = documents.get(params.textDocument.uri);
   const ast = astCache.get(params.textDocument.uri);
   if (!doc || !ast) return [];
+
+  // Extract the text of the current line up to the cursor for context detection.
+  const lineStart = doc.offsetAt({ line: params.position.line, character: 0 });
+  const cursorOffset = doc.offsetAt(params.position);
+  const linePrefix = doc.getText().slice(lineStart, cursorOffset);
+
   const provider = new CompletionProvider(registry, settings.version);
-  return provider.provideCompletions(ast, params.position);
+  return provider.provideCompletions(ast, params.position, linePrefix);
 });
 
 connection.onHover((params: HoverParams): Hover | null => {

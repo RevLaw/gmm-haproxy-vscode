@@ -4,6 +4,7 @@ module.exports = {
   testEnvironment: 'node',
   roots: ['<rootDir>/test'],
   testMatch: ['**/*.test.ts'],
+
   transform: {
     '^.+\\.ts$': ['ts-jest', {
       tsconfig: './tsconfig.test.json',
@@ -17,6 +18,7 @@ module.exports = {
     'server/src/parser/**/*.ts',
     'server/src/validation/**/*.ts',
     'server/src/registry/**/*.ts',
+    'server/src/completion/**/*.ts',
     '!**/*.d.ts',
   ],
   coverageThreshold: {
