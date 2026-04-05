@@ -1,5 +1,6 @@
 import { SectionType } from '../parser/ast';
 import { DIRECTIVES } from '../data/directives';
+import { GLOBAL_DIRECTIVES } from '../data/global';
 import { matrixToSections } from '../data/types';
 
 /** A directive definition as used by providers (completion, hover, validation). */
@@ -36,7 +37,8 @@ export class VersionRegistry {
     if (cached) return cached;
 
     const map = new Map<string, DirectiveDefinition>();
-    for (const d of DIRECTIVES) {
+    const ALL_DIRECTIVES = [...DIRECTIVES, ...GLOBAL_DIRECTIVES];
+    for (const d of ALL_DIRECTIVES) {
       // Skip if introduced after this version
       if (this.compareVersions(resolved, d.since) < 0) continue;
       // Skip if fully removed at or before this version
