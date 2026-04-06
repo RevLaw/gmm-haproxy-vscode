@@ -69,7 +69,7 @@ export class SymbolsProvider {
       const endLine = Math.max(startLine, nextSection.headerRange.startLine - 1);
       return {
         start: { line: startLine, character: 0 },
-        end:   { line: endLine, character: Number.MAX_SAFE_INTEGER },
+        end:   { line: endLine, character: 2147483647 },
       };
     }
 
