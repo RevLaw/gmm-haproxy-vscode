@@ -1,5 +1,7 @@
 import { HaproxyParser } from '../../server/src/parser/parser';
-import { CodeActionsProvider } from '../../server/src/codeactions/codeActionsProvider';
+import { CodeActionsProvider, SAFE_REPLACEMENTS } from '../../server/src/codeactions/codeActionsProvider';
+import { ValidationProvider } from '../../server/src/validation/validator';
+import { VersionRegistry } from '../../server/src/registry/versionRegistry';
 import { Diagnostic, DiagnosticSeverity } from '../__mocks__/vscode-languageserver';
 
 const parser = new HaproxyParser();
@@ -58,7 +60,7 @@ describe('CodeActionsProvider', () => {
   describe('option forceclose replacement', () => {
     it('offers quick fix for deprecated option forceclose', () => {
       const text = 'backend web\n    option forceclose\n';
-      const diag = makeDeprecatedDiag(1, "'option forceclose' is deprecated since HAProxy 1.9.");
+      const diag = makeDeprecatedDiag(1, "'option forceclose' is deprecated since HAProxy 2.0.");
       const actions = getActions(text, [diag]);
       expect(actions).toHaveLength(1);
       expect(actions[0]?.title).toContain('http-server-close');
@@ -92,5 +94,33 @@ describe('CodeActionsProvider', () => {
       };
       expect(getActions(text, [diag])).toHaveLength(0);
     });
+  });
+
+  /**
+   * Smoke test: every entry in SAFE_REPLACEMENTS must have a matching directive
+   * in the data that actually generates a deprecation warning. This test catches
+   * the class of bug where a quick-fix key has no data backing it (silent no-op).
+   */
+  describe('SAFE_REPLACEMENTS smoke test — every key generates a real deprecation warning', () => {
+    const registry = new VersionRegistry();
+    const validator = new ValidationProvider(registry, '3.1');
+
+    for (const directiveName of Object.keys(SAFE_REPLACEMENTS)) {
+      it(`'${directiveName}' triggers a deprecation warning on version 3.1`, () => {
+        const [kw, ...args] = directiveName.split(' ');
+        const indent = '    ';
+        const line = args.length > 0
+          ? `${indent}${kw} ${args.join(' ')}`
+          : `${indent}${kw}`;
+        const text = `backend web\n${line}\n`;
+        const doc = parser.parse(text, 'test://smoke');
+        const diags = validator.validate(doc);
+        const deprecationWarning = diags.find(
+          (d: { message: string }) => d.message.includes('is deprecated since HAProxy')
+                 && d.message.toLowerCase().includes(directiveName.toLowerCase())
+        );
+        expect(deprecationWarning).toBeDefined();
+      });
+    }
   });
 });

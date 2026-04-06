@@ -5,7 +5,7 @@ import { HaproxyDocument } from '../parser/ast';
  * Directives where a direct text substitution is safe.
  * key = deprecated directive name (lowercase), value = replacement text.
  */
-const SAFE_REPLACEMENTS: Record<string, string> = {
+export const SAFE_REPLACEMENTS: Record<string, string> = {
   'option httpclose':   'option http-server-close',
   'option forceclose':  'option http-server-close',
 };

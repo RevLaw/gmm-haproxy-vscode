@@ -620,6 +620,17 @@ export const DIRECTIVES: DirectiveDef[] = [
     docsUrl: `${DOCS}#option%20httpchk`,
   },
   {
+    name: 'option forceclose',
+    signature: 'option forceclose',
+    description: 'Deprecated alias for http-server-close. Actively closes connections to free sockets earlier.',
+    sections: ALL_PROXY,
+    since: '1.5',
+    invertible: true,
+    httpOnly: true,
+    deprecated: '2.0',
+    category: 'http',
+  },
+  {
     name: 'option httpclose',
     signature: 'option httpclose',
     description: 'Enable passive HTTP connection closing (deprecated, use http-server-close).',
