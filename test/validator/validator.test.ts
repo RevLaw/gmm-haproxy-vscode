@@ -15,14 +15,15 @@ function validate(text: string, version = '3.1') {
 describe('ValidationProvider', () => {
   describe('unknown directives', () => {
     it('reports error for completely unknown directive', () => {
-      const diags = validate('backend web\n    notadirective foo\n');
+      const diags = validate('backend web\n    notadirective foo\n')
+        .filter((d) => d.severity === DiagnosticSeverity.Error);
       expect(diags).toHaveLength(1);
       expect(diags[0]?.severity).toBe(DiagnosticSeverity.Error);
       expect(diags[0]?.message).toMatch(/unknown directive/i);
     });
 
     it('passes for known directive in correct section', () => {
-      const diags = validate('backend web\n    balance roundrobin\n');
+      const diags = validate('frontend main\n    use_backend web\nbackend web\n    balance roundrobin\n');
       expect(diags).toHaveLength(0);
     });
   });
@@ -173,13 +174,13 @@ describe('ValidationProvider', () => {
   describe('version fallback', () => {
     it('falls back to nearest lower version for unknown version string', () => {
       // 3.5 is unknown — should resolve to 3.1 (nearest lower)
-      const diags = validate('backend web\n    balance roundrobin\n', '3.5');
+      const diags = validate('frontend main\n    use_backend web\nbackend web\n    balance roundrobin\n', '3.5');
       expect(diags).toHaveLength(0);
     });
 
     it('falls back to oldest known version when version is older than all known', () => {
       // 1.0 is older than 2.4 (our oldest known) — should resolve to 2.4
-      const diags = validate('backend web\n    balance roundrobin\n', '1.0');
+      const diags = validate('frontend main\n    use_backend web\nbackend web\n    balance roundrobin\n', '1.0');
       expect(diags).toHaveLength(0);
     });
   });
@@ -465,7 +466,7 @@ describe('ValidationProvider', () => {
     const v = '2.4';
 
     it('accepts balance roundrobin (valid since 1.0)', () => {
-      expect(validate('backend web\n    balance roundrobin\n', v)).toHaveLength(0);
+      expect(validate('frontend main\n    use_backend web\nbackend web\n    balance roundrobin\n', v)).toHaveLength(0);
     });
 
     it('errors on reqrep (removed in 2.4)', () => {
@@ -498,7 +499,7 @@ describe('ValidationProvider', () => {
     const v = '2.6';
 
     it('accepts balance roundrobin', () => {
-      expect(validate('backend web\n    balance roundrobin\n', v)).toHaveLength(0);
+      expect(validate('frontend main\n    use_backend web\nbackend web\n    balance roundrobin\n', v)).toHaveLength(0);
     });
 
     it('errors on reqrep (still removed in 2.6)', () => {
@@ -529,7 +530,7 @@ describe('ValidationProvider', () => {
     const v = '2.8';
 
     it('accepts known directives', () => {
-      expect(validate('backend web\n    balance leastconn\n', v)).toHaveLength(0);
+      expect(validate('frontend main\n    use_backend web\nbackend web\n    balance leastconn\n', v)).toHaveLength(0);
     });
 
     it('errors on reqrep (still removed in 2.8)', () => {
@@ -556,7 +557,7 @@ describe('ValidationProvider', () => {
     const v = '3.0';
 
     it('accepts known directives', () => {
-      expect(validate('backend web\n    balance source\n', v)).toHaveLength(0);
+      expect(validate('frontend main\n    use_backend web\nbackend web\n    balance source\n', v)).toHaveLength(0);
     });
 
     it('errors on unknown directive', () => {
@@ -573,7 +574,7 @@ describe('ValidationProvider', () => {
 
   describe('per-version validation — HAProxy 3.1 (default)', () => {
     it('accepts balance roundrobin', () => {
-      expect(validate('backend web\n    balance roundrobin\n')).toHaveLength(0);
+      expect(validate('frontend main\n    use_backend web\nbackend web\n    balance roundrobin\n')).toHaveLength(0);
     });
 
     it('errors on reqrep (removed since 2.4)', () => {

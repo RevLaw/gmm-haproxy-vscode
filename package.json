@@ -2,12 +2,15 @@
   "name": "gmm-haproxy-vscode",
   "displayName": "HAProxy Config",
   "description": "Full language support for HAProxy configuration files — syntax highlighting, autocompletion, validation, hover docs, snippets, and formatting. Multi-version support from 2.4 LTS to 3.1.",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "publisher": "gmm",
   "author": {
     "name": "Juan Torchia",
     "email": "j.s.torchia@gmail.com"
   },
+  "contributors": [
+    { "name": "RevLaw", "url": "https://github.com/RevLaw" }
+  ],
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -42,9 +45,6 @@
     "color": "#1a1a2e",
     "theme": "dark"
   },
-  "activationEvents": [
-    "onLanguage:haproxy"
-  ],
   "main": "./client/out/extension.js",
   "contributes": {
     "languages": [
